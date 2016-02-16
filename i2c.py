@@ -15,9 +15,10 @@ def bearing3599():
         bear = bear/10.0
         return bear
 
-while True:
-        bearing = bearing3599()     #this returns the value to 1 decimal place in degrees.
-        bear255 = bearing255()      #this returns the value as a byte between 0 and 255.
-        print bearing
-        print bear255
-        time.sleep(1)
+def ic2Main():
+  while True:
+          bearing = bearing3599()     #this returns the value to 1 decimal place in degrees.
+          bear255 = bearing255()      #this returns the value as a byte between 0 and 255.
+          print bearing
+          print bear255
+          time.sleep(1)
