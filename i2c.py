@@ -1,7 +1,7 @@
 #http://www.instructables.com/id/Raspberry-Pi-I2C-Python/
 import smbus
 import time
-bus = smbus.SMBus(0)
+bus = smbus.SMBus(1)
 address = 0x60
 
 def bearing255():
@@ -22,3 +22,4 @@ def ic2Main():
           print bearing
           print bear255
           time.sleep(1)
+ic2Main()

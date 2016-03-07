@@ -2,13 +2,15 @@
 
 import smbus
 import time
-bus = smbus.SMBus(0)
-address = 0x70
+bus = smbus.SMBus(1)
+address = 0x60
 
 #SRF08 REQUIRES 5V
 
 def write(value):
         bus.write_byte_data(address, 0, value)
+        #print 
+        #print bus.read_byte_data(address,3)
         return -1
 
 def lightlevel():
@@ -22,11 +24,14 @@ def ic2Range():
         return range3
 
 def otherMain():
-  while True:
-          write(0x51)
+        while True:
+          write(0x50)
+          #print 0x51
           time.sleep(0.7)
-          lightlvl = lightlevel()
-          rng = range()
-          print lightlvl
+          #lightlvl = lightlevel()
+          rng = ic2Range()
+          #print lightlvl
           print rng
+          
+
 otherMain()
