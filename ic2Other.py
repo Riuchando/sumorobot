@@ -29,3 +29,4 @@ def otherMain():
           rng = range()
           print lightlvl
           print rng
+otherMain()
