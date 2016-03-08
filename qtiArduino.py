@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 #using the gpio tutorial from parallax.com
 import wiringpi2 as wp
+import RPi.GPIO as GPIO
 import time
 
 
-pin=10
+pin=11
 
 def initQTI():
     #pin = pinNum
@@ -12,8 +13,11 @@ def initQTI():
     wp.wiringPiSetup()
     wp.wiringPiSetupGpio()
     wp.wiringPiSetupPhys()
+    #GPIO.setmode(GPIO.BOARD)
     
-def getRC(sensorIn=10):
+
+    
+def getRC(sensorIn=11):
     #make pin output
     wp.pinMode(sensorIn,1)
     #set pin to high to discharge capacitor
@@ -26,24 +30,50 @@ def getRC(sensorIn=10):
     wp.digitalWrite(sensorIn,0)
     return wp.digitalRead(sensorIn)
 
-def RCTime(sensorIn=10):
-    #make pin output
-    wp.pinMode(sensorIn,1)
-    #set pin to high to discharge capacitor
-    wp.digitalWrite(sensorIn,1)
-    #wait 1 ms
-    time.sleep(0.1)
-    #make pin Input
-    wp.pinMode(sensorIn,0)
-    #turn off internal pullups
-    wp.digitalWrite(sensorIn,0)
-    #t=wp.digitalRead(sensorIn)
-    #print wp.digitalRead(sensorIn)
-    duration=0
-    while wp.digitalRead(sensorIn):
-        #wait for the pin to go Low
-        print wp.digitalRead(sensorIn)
-        duration+=1
-    return 0
-initQTI()
-print RCTime(pin)
+def RCTime(sensorIn=11,wiring=True):
+    duration=0    
+    
+    if wiring==True:
+        initQTI()
+        #make pin output
+        wp.pinMode(sensorIn,1)
+        #set pin to high to discharge capacitor
+        wp.digitalWrite(sensorIn,1)
+        #wait 1 ms
+        time.sleep(0.1)
+        #make pin Input
+        wp.pinMode(sensorIn,0)    
+        #turn off internal pullups
+        wp.digitalWrite(sensorIn,0)
+        #t=wp.digitalRead(sensorIn)
+        #print wp.digitalRead(sensorIn)
+        while wp.digitalRead(sensorIn)==1:
+            #wait for the pin to go Low
+            #print 'not yet' 
+            duration+=1
+    else:
+        GPIO.setup(pin,GPIO.OUT)
+        #set pin to high to discharge capacitor
+        
+        GPIO.output(pin,1)
+        #wait 1 ms
+        time.sleep(0.1)
+        #make pin Input
+        #GPIO.setup(pin,GPIO.IN)
+        GPIO.setup(pin,GPIO.IN,GPIO.PUD_DOWN)
+        #turn off internal pullups
+        #wp.digitalWrite(sensorIn,0)
+        #GPIO.output(pin,0)
+
+        while True:
+            #wait for the pin to go Low
+            print GPIO.input(sensorIn)
+            duration+=1
+    return duration
+try:
+    wiring=True
+    #while True:
+    print RCTime(pin,wiring)
+finally:
+    if wiring == False:
+        GPIO.cleanup()
