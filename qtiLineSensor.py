@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO
 import time
 
 
-pin=11
+
 
 def initQTI():
     #pin = pinNum
@@ -30,7 +30,7 @@ def getRC(sensorIn=11):
     wp.digitalWrite(sensorIn,0)
     return wp.digitalRead(sensorIn)
 
-def RCTime(sensorIn=11,wiring=True):
+def RCTime(pin=11,wiring=True):
     duration=0    
     
     if wiring==True:
@@ -72,8 +72,11 @@ def RCTime(sensorIn=11,wiring=True):
     return duration
 try:
     wiring=True
-    #while True:
-    print RCTime(pin,wiring)
+    while True:
+        print RCTime(11,wiring)
+        print RCTime(13,wiring)
+        print RCTime(16,wiring)
+        print RCTime(18,wiring)
 finally:
     if wiring == False:
         GPIO.cleanup()

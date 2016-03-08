@@ -1,17 +1,17 @@
 import RPi.GPIO as GPIO
 import time
-def main():
+def takeMeasurement():
     GPIO.setmode(GPIO.BOARD)
 
-    TRIG=18
-    ECHO=16
+    TRIG=11
+    ECHO=13
 
     GPIO.setup(TRIG,GPIO.OUT)
     GPIO.output(TRIG,0)
 
     GPIO.setup(ECHO,GPIO.IN)
     time.sleep(0.12)
-    print 'Starting measurements...'
+    #print 'Starting measurements...'
     GPIO.output(TRIG,1)
     time.sleep(0.00001)
     GPIO.output(TRIG,0)
@@ -24,8 +24,10 @@ def main():
     stop=time.time()
     print (stop - start ) * 17000
 
-try:
-    while True:
-        main()
-finally:
-    GPIO.cleanup()
+def main():
+    try:
+        while True:
+            takeMeasurement()
+    finally:
+        GPIO.cleanup()
+main()

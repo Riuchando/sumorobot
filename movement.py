@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
-
-mh = Adafruit_MotorHat(addr=0x60) #note stopping this program DOES NOT stop the motor
+import time
+mh = Adafruit_MotorHAT(addr=0x70) #note stopping this program DOES NOT stop the motor
 #we COULD make this an array but for programming simplicity, have 4 variables
 upperLeft=mh.getMotor(1)
 upperRight=mh.getMotor(2)
@@ -21,22 +21,24 @@ def forward(speed =50, timeout=5):
   #slowly accellerate the motors so they aren't jerky,
   #think of someone constantly stopping and starting car
   
-  for i in range(speed):
+  for i in range(speed)[::2]:
     upperLeft.setSpeed(i)
     upperRight.setSpeed(i)
     lowerLeft.setSpeed(i)
     lowerRight.setSpeed(i)
+    print 'here'
     #if the upper right sensor detects the line
-    if getRC(3):
-      stop(0)
-      turnLeft(speed=speed, angle=90, sharpness=90)
-    #if the upper left sensor detects the line
-    elif getRC(4):
-      stop(0)
-      turnRight(speed=speed, angle=90, sharpness=90)
-    time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
+  
+  #  if getRC(3):
+  #   stop(0)
+  #    turnLeft(speed=speed, angle=90, sharpness=90)
+  #  #if the upper left sensor detects the line
+  #  elif getRC(4):
+  #    stop(0)
+  #    turnRight(speed=speed, angle=90, sharpness=90)
+  #  time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
   #note that we don't have a manual stop in here    
-
+  
   
   
 
@@ -83,21 +85,22 @@ def turnRight(speed =5, angle=30,sharpness = 0,untilStop=False):
   
 
 
-def back(speed =5):
+def back(speed =255,accel=10):
   #the same with the forward
   #need to set up the detection on seeing if the motors can be run in parellel
   if speed > 255 or speed < 0:
     return # do nothing for now, write error message at some point
   upperLeft.run(Adafruit_MotorHAT.BACKWARD)
   upperRight.run(Adafruit_MotorHAT.BACKWARD)
-  lowerLeft.run(Adafruit_MotorHAT.FORWARD)
-  lowerRight.run(Adafruit_MotorHAT.FORWARD)
-  for i in range(speed):
+  lowerLeft.run(Adafruit_MotorHAT.BACKWARD)
+  lowerRight.run(Adafruit_MotorHAT.BACKWARD)
+  for i in range(speed)[::accel]:
+    print i
     upperLeft.setSpeed(i)
     upperRight.setSpeed(i)
     lowerLeft.setSpeed(i)
     lowerRight.setSpeed(i)
-    if 
+   # if 
     time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
 
 def stop(speed=0):
@@ -124,3 +127,9 @@ def redirect(direction):
   turnLeft(sharpness=20,untilStop=True)
   forward(speed=50)
 
+try:
+  forward(254)
+  stop()
+  back(254)
+finally:
+  stop()
