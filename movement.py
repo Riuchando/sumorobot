@@ -26,7 +26,7 @@ def forward(speed =50, timeout=5):
     upperRight.setSpeed(i)
     lowerLeft.setSpeed(i)
     lowerRight.setSpeed(i)
-    print 'here'
+    #print 'here'
     #if the upper right sensor detects the line
   
   #  if getRC(3):
@@ -67,7 +67,7 @@ def turnLeft(speed =5, angle=30, sharpness = 0,untilStop=False):
     time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
   #pass
 
-def turnRight(speed =5, angle=30,sharpness = 0,untilStop=False):
+def turnRight(speed =5, angle=30,sharpness = 0,untilStop=False,accel=10):
   #same as turn left, figure out Radians or Degrees
   if speed > 255 or speed < 0:
     return # do nothing for now, write error message at some point
@@ -75,16 +75,44 @@ def turnRight(speed =5, angle=30,sharpness = 0,untilStop=False):
   upperRight.run(Adafruit_MotorHAT.BACKWARD)
   lowerLeft.run(Adafruit_MotorHAT.FORWARD)
   lowerRight.run(Adafruit_MotorHAT.BACKWARD)
-  for i in range(speed):
-    upperLeft.setSpeed(i)
-    upperRight.setSpeed(i)
-    lowerLeft.setSpeed(i)
-    lowerRight.setSpeed(i)
-    time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
-  stop()
+  if accel != -1:
+    for i in range(speed)[::accel]:
+      upperLeft.setSpeed(i)
+      upperRight.setSpeed(i)
+      lowerLeft.setSpeed(i)
+      lowerRight.setSpeed(i)
+  else:
+    upperLeft.setSpeed(speed)
+    upperRight.setSpeed(speed)
+    lowerLeft.setSpeed(speed)
+    lowerRight.setSpeed(speed)
+  #time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
+  if untilStop == True:
+    stop()
   
-
-
+def oneWheelTime(speed=255, accel=10):
+  upperLeft.run(Adafruit_MotorHAT.FORWARD)
+  upperRight.run(Adafruit_MotorHAT.FORWARD)# the polarity is mixed up
+  lowerLeft.run(Adafruit_MotorHAT.BACKWARD)# the polarity is mixed up
+  lowerRight.run(Adafruit_MotorHAT.FORWARD)# the polarity is mixed up
+  for i in range(speed)[::accel]:
+      upperLeft.setSpeed(i)
+  time.sleep(1)
+  #stop()
+  for i in range(speed)[::accel]:
+    upperRight.setSpeed(i)
+  time.sleep(1)
+  #stop()
+  for i in range(speed)[::accel]:
+    lowerLeft.setSpeed(i)
+  time.sleep(1)
+  #stop()
+  for i in range(speed)[::accel]:
+    lowerRight.setSpeed(i)
+  time.sleep(1)
+  #stop()
+      
+      
 def back(speed =255,accel=10):
   #the same with the forward
   #need to set up the detection on seeing if the motors can be run in parellel
@@ -126,10 +154,22 @@ def redirect(direction):
   turnRight(speed=50, angle=90,sharpness=90)
   turnLeft(sharpness=20,untilStop=True)
   forward(speed=50)
-
-try:
-  forward(254)
-  stop()
-  back(254)
-finally:
-  stop()
+def mainTest():
+  try:
+    forward(255)
+    time.sleep(1)
+    stop()
+    back(255)
+    #stop()
+    #turnLeft(255)
+    #stop()
+    #slow and smooth
+    #turnRight(speed=255, accel=1)
+    #fast and jerky
+    #turnRight(speed=255, accel=-1)
+    #oneWheelTime(speed=255, accel=10)
+    time.sleep(1)
+    #stop()
+  finally:
+    stop()
+#mainTest()

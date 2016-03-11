@@ -1,21 +1,30 @@
 import time
 from movement import *
-from qtiArduino import *
-from i2c import *
+from qtiLineSensor import *
+from sonar import takeMeasurement
+
 def init():
     time.sleep(5)
     initQTI(2)
 
 #test to make sure it can find an object run into it push it out until a trigger then stop
-def simpleTest():
-    #rotate
-    turnLeft(speed=5, sharpness= 1, untilStop=True )
-    while abs(bearing3599()-10)>0:
+def allSensorsTest():
+    #rotate for a little bit
+    #NOTE that SPEED refers to top speed
+    #I should add in accelleration
+    turnLeft(speed=255, sharpness= 1, untilStop=True )
+    #initialize the take measurements
+    tm=takeMeasurement()
+    #there gets some errors when it gets too close
+    while (tm - 3)>0:
         print 'wait'
-    stop(speed=5)
-    forward(speed=50)
+        tm=takeMeasurement()
+
+    
+    stop(speed=255)
+    forward(speed=255)
     #check the front two pins
-    while getRC(2) and getRC(3):
+    while RCTime(pin=11) and RCTime(pin=13):
         print 'wait'
     stop(speed=50)
     back(speed=10)
@@ -23,5 +32,35 @@ def simpleTest():
     turnRight(speed =1, angle=180,sharpness=50)
     stop(speed=20)
 
-
+#move forward 
+def handTest():
+    forward()
+    tm=takeMeasurement()
+    #there gets some errors when it gets too close
+    while (tm - 3)>0:
+        print 'wait'
+        tm=takeMeasurement()
+    stop(speed=255, accel=10)
     
+def lineTest():
+    forward()
+    possiblePins=[11,13,16,18]
+    #for possible in possiblePins:
+    #    print 'pin ', str(possible), ' : ' , RCTime(possible)
+    #print 'pin 11 : ' , RCTime(11), ' pin 13 : ', RCTime(13)
+    
+    while True:
+        for possible in possiblePins:
+           print 'pin ', str(possible), ' : ' , getRC(possible)
+        time.sleep(0.1)
+        pass
+        
+    stop()
+
+try:
+    wiring=True
+    initQTI(wiring)
+    lineTest()
+    #print 'test'
+finally:
+    stop()
