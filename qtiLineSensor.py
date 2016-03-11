@@ -6,6 +6,18 @@ import wiringpi2 as wp
 import RPi.GPIO as GPIO
 import time
 
+sample=[]
+mu=0 # try to calculate mean only once
+sd=0 #try to calculate sd only once
+rightTail=0
+def upMean():
+    print sample
+    mu=sum(sample)/len(sample)
+    
+    sd = (sum([ (s-mu)**2 for s in sample])/30.0)**(0.5)
+    print sd
+    rightTail=int(mu+2*sd)
+    print rightTail
 def initQTI(wiring=True):
     #pin = pinNum
     if wiring == True:
@@ -25,20 +37,19 @@ def initRC(pin):
     #make pin Input
     wp.pinMode(pin,0)    
     #turn off internal pullups
-    wp.digitalWrite(pin,0)
+    #wp.digitalWrite(pin,0)
     
     
 #this will get a singe reading, maybe need to figure out how threading works
 #and try to make something clever if not put this in a while loop
-def getRC(pin=11,duration=0):
-    if wp.digitalRead(pin) == 0:
-        return 0
-    else:
-        return 1
+def getRC(pin=11):
+    return wp.digitalRead(pin)
+        
 
 #find a way to start up a thread that periodically checked this and stores it in a buffer
 #then do some quick statistics to make sure a single bad readng doens't throw this off
-def RCTime(pin=11,wiring=True):
+    #ABANDON THIS
+def RCTime(pin=11,wiring=True,short=False):
     duration=0    
     #not sure if the GPIO version of this translation works,
     #so keep using Wiringpi version
@@ -49,20 +60,23 @@ def RCTime(pin=11,wiring=True):
         #set pin to high to discharge capacitor
         wp.digitalWrite(pin,1)
         #wait 1 ms
-        #time.sleep(0.1)
+        time.sleep(0.001)
         #make pin Input
         wp.pinMode(pin,0)    
         #turn off internal pullups
-        wp.digitalWrite(pin,0)
-    
-        while wp.digitalRead(pin)==1:
-            #wait for the pin to go Low
-            #print pin,    wp.digitalRead(pin)
-            #print 'not yet' 
-            duration+=1
-            
-        wp.pinMode(pin,1)
-        wp.digitalWrite(pin,1)
+        #wp.digitalWrite(pin,0)
+        wp.pullUpDnControl(pin,1)
+        if short == True:
+            while wp.digitalRead(pin)==1 and duration < rightTail:
+                #wait for the pin to go Low
+                #print pin,    wp.digitalRead(pin)
+                #print 'not yet'
+                duration+=1
+        else:
+            while wp.digitalRead(pin)==1 :
+                duration+=1
+        #wp.pinMode(pin,1)
+        #wp.digitalWrite(pin,1)
     else:
         GPIO.setup(pin,GPIO.OUT)
         #set pin to high to discharge capacitor
@@ -88,12 +102,25 @@ def main():
         #so for now just use the wiringpi2 library as seen here
         wiring=True
         initQTI(wiring)
+        
         while True:
             #print '11 : ', RCTime(11,wiring)
-            time.sleep(0.5)
+            time.sleep(0.1)
             #print '13 : ',RCTime(13,wiring)
-            print '16 : ',RCTime(16,wiring)
+            #print '16 : ',RCTime(16,wiring)
             #print '18 : ',RCTime(18,wiring)
+            if len(sample) < 30:
+                print RCTime(16,wiring)
+                
+                sample.append(RCTime(pin=16,wiring=wiring, short =False))
+            elif len(sample) == 30:
+                sample.append(RCTime(pin=16,wiring=wiring, short =False))
+                upMean()
+            else:
+                if RCTime(16,wiring=wiring,short=True) == rightTail:
+                    print 'possible detection', rightTail
+                    
+            
     finally:
         if wiring == False:
             GPIO.cleanup()
