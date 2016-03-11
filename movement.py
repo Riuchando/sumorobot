@@ -156,10 +156,10 @@ def redirect(direction):
   forward(speed=50)
 def mainTest():
   try:
-    forward(255)
+    forward(25)
     time.sleep(1)
     stop()
-    back(255)
+    #back(255)
     #stop()
     #turnLeft(255)
     #stop()

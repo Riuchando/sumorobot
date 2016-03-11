@@ -1,6 +1,7 @@
 import time
 from movement import *
-from qtiLineSensor import *
+#from qtiLineSensor import *
+from qtilClass import *
 from sonar import takeMeasurement
 
 def init():
@@ -48,18 +49,18 @@ def lineTest():
     #for possible in possiblePins:
     #    print 'pin ', str(possible), ' : ' , RCTime(possible)
     #print 'pin 11 : ' , RCTime(11), ' pin 13 : ', RCTime(13)
-    
-    while True:
-        for possible in possiblePins:
-           print 'pin ', str(possible), ' : ' , getRC(possible)
-        time.sleep(0.1)
-        pass
-        
+    t=qtiWrapper()
+    #while True:
+    #    for possible in possiblePins:
+    #       print 'pin ', str(possible), ' : ' , getRC(possible)
+    #    time.sleep(0.1)
+    #    pass
+    while    
     stop()
 
 try:
     wiring=True
-    initQTI(wiring)
+    #initQTI(wiring)
     lineTest()
     #print 'test'
 finally:

@@ -133,7 +133,7 @@ class qtiWrapper:
                     self.upMean()
                 else:
                     if self.RCTime(16,wiring=wiring,short=True) == self.rightTail:
-                        print 'possible detection'
+                        print 'possible detection', self.sample
                         
         finally:
             if wiring == False:
