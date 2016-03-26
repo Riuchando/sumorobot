@@ -50,18 +50,28 @@ def lineTest():
     #    print 'pin ', str(possible), ' : ' , RCTime(possible)
     #print 'pin 11 : ' , RCTime(11), ' pin 13 : ', RCTime(13)
     t=qtiWrapper()
-    #while True:
-    #    for possible in possiblePins:
-    #       print 'pin ', str(possible), ' : ' , getRC(possible)
-    #    time.sleep(0.1)
+    
+    
+    for possible in possiblePins:
+        print 'pin ', str(possible), ' : ' , t.detect(n)
+    time.sleep(0.1)
     #    pass
-    while    
+
+    print 'testing with motors on'
+    forward()
+    #busy wait until the sensors detect something
+    while t.detectList(possiblePins):
+        pass
+    
     stop()
+    time.sleep(0.5)
 
 try:
     wiring=True
+    #note that this is depricated
     #initQTI(wiring)
     lineTest()
+    movementTest()
     #print 'test'
 finally:
     stop()

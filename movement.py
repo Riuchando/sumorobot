@@ -154,7 +154,7 @@ def redirect(direction):
   turnRight(speed=50, angle=90,sharpness=90)
   turnLeft(sharpness=20,untilStop=True)
   forward(speed=50)
-def mainTest():
+def movementTest():
   try:
     forward(25)
     time.sleep(1)
@@ -172,4 +172,4 @@ def mainTest():
     #stop()
   finally:
     stop()
-#mainTest()
+movementTest()

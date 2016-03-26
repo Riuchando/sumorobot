@@ -6,17 +6,21 @@ import wiringpi2 as wp
 import RPi.GPIO as GPIO
 import time
 class qtiWrapper:
-    #this will store statistics, for now they
+    #this will store statistics, for now it is using simple knowledge of standard deviation to avoid taking too much time on the clock
+    #I cold re-write this to be tied to each sensor since there is a chance that the sensors may differ in readings, ie a sensor that is time ==2000 for light 17000 for dark
+    #and another sensor that is 200 for light and 700 for dark, but that is uncertain at this time
     def __init__(self,wiring=True):
         self.sample=[]
         self.mu=0 # try to calculate mean only once
         self.sd=0 #try to calculate sd only once
+        #self.pin=pin
         self.rightTail=0
         #might put initQTI here
         self.initQTI(wiring)
         #might make it so it will be able to hold multiple pins
         #might put a gather sample data here
-        self.gatherSample()
+        self.gatherSample(pin=18)
+        
     def upMean(self):
         #print self.sample
         self.mu=sum(self.sample)/len(self.sample)
@@ -74,6 +78,7 @@ class qtiWrapper:
             #turn off internal pullups
             #wp.digitalWrite(pin,0)
             wp.pullUpDnControl(pin,1)
+	    #print "here"
             if short == True:
                 while wp.digitalRead(pin)==1 and duration < self.rightTail:
                     #wait for the pin to go Low
@@ -81,9 +86,11 @@ class qtiWrapper:
                     #print 'not yet'
                     duration+=1
             else:
-                while wp.digitalRead(pin)==1 :
-                    duration+=1
-            #wp.pinMode(pin,1)
+                while wp.digitalRead(pin)==1 and duration <50000: 
+           		#print "here"
+			duration+=1
+            print duration 
+	    #wp.pinMode(pin,1)
             #wp.digitalWrite(pin,1)
         else:
             GPIO.setup(pin,GPIO.OUT)
@@ -98,14 +105,14 @@ class qtiWrapper:
             #turn off internal pullups
             while True:
                 #wait for the pin to go Low
-                print GPIO.input(sensorIn)
+                #print GPIO.input(sensorIn)
                 duration+=1
         return duration
     #note that the variagble of wiring might be put everywhere
     #at this point, I think I'll stick to wiringpi2 over GPIO, but I won't know
-    def gatherSample(self,wiring=True):
+    def gatherSample(self,pin=16,wiring=True):
         while len(self.sample)< 30:
-            self.sample.append(self.RCTime(pin=16,wiring=wiring, short =False))
+            self.sample.append(self.RCTime(pin=pin,wiring=wiring, short =False))
         self.upMean()
         
     #this is just a test for the wiring, it prints out to the main screen
@@ -125,14 +132,14 @@ class qtiWrapper:
                 #print '16 : ',RCTime(16,wiring)
                 #print '18 : ',RCTime(18,wiring)
                 if len(self.sample) < 30:
-                    print self.RCTime(16,wiring)
+                    print self.RCTime(11,wiring)
                     
-                    self.sample.append(self.RCTime(pin=16,wiring=wiring, short =False))
+                    self.sample.append(self.RCTime(pin=18,wiring=wiring, short =False))
                 elif len(self.sample) == 30:
-                    self.sample.append(self.RCTime(pin=16,wiring=wiring, short =False))
+                    self.sample.append(self.RCTime(pin=18,wiring=wiring, short =False))
                     self.upMean()
                 else:
-                    if self.RCTime(16,wiring=wiring,short=True) == self.rightTail:
+                    if self.RCTime(18,wiring=wiring,short=False) == self.rightTail:
                         print 'possible detection', self.sample
                         
         finally:
@@ -142,9 +149,19 @@ class qtiWrapper:
     #this will probably be the one for the actual data gathering from other
     #can't decide if this should have it's own infinite loop and be a separate process
     #or should be a single bool that takes appx 776 ns to calculate
-    def detect(self):
-        return self.RCTime(16,wiring=wiring,short=True) == self.rightTail
-            
+    def detect(self,pin):
+        return self.RCTime(pin,wiring=wiring,short=True) == self.rightTail
+
+    #I suppose I could have made this a complicated if statement, the idea is to check different configurations of qtipins at the same time
+    #it has error handling of list size of 1, which doesn't have a nice reduce statement because of infix notation
+    def detectList(self,pinList):
+        if len(pinList)>1:
+            return reduce(lambda x,y: detect(x) and detect(y), pinList)
+        elif len(pinList) ==1:
+            return detect(pinList)
+        else:
+            print 'I hope you know what you are doing, this is an empty list'
+            return False
             
 x=qtiWrapper()
 x.main()

@@ -8,8 +8,8 @@ import time
 def takeMeasurement():
     GPIO.setmode(GPIO.BOARD)
 
-    TRIG=11
-    ECHO=13
+    TRIG=29
+    ECHO=31
 
     GPIO.setup(TRIG,GPIO.OUT)
     GPIO.output(TRIG,0)
@@ -39,4 +39,4 @@ def main():
             takeMeasurement()
     finally:
         GPIO.cleanup()
-#main()
+main()
