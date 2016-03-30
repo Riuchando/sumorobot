@@ -8,6 +8,7 @@ def init():
     time.sleep(5)
     initQTI(2)
 
+
 #test to make sure it can find an object run into it push it out until a trigger then stop
 def allSensorsTest():
     #rotate for a little bit
@@ -35,32 +36,32 @@ def allSensorsTest():
 
 #move forward 
 def handTest():
-    forward()
+    back(speed=100,accel=10)
     tm=takeMeasurement()
+    print tm
     #there gets some errors when it gets too close
-    while (tm - 3)>0:
-        print 'wait'
+    while tm > 5:
+        print tm
         tm=takeMeasurement()
-    stop(speed=255, accel=10)
-    
+    #forward(speed=255, )
+    stop()    
+
 def lineTest():
-    forward()
+    #forward(speed=25)
+    back(speed=50)
     possiblePins=[11,13,16,18]
     #for possible in possiblePins:
     #    print 'pin ', str(possible), ' : ' , RCTime(possible)
     #print 'pin 11 : ' , RCTime(11), ' pin 13 : ', RCTime(13)
     t=qtiWrapper()
     
-    
-    for possible in possiblePins:
-        print 'pin ', str(possible), ' : ' , t.detect(n)
-    time.sleep(0.1)
-    #    pass
+    while t.detectList(possiblePins)==True:
+	pass
 
-    print 'testing with motors on'
-    forward()
+    forward(speed=50)
+    #back(speed=25)
     #busy wait until the sensors detect something
-    while t.detectList(possiblePins):
+    while t.detectList(possiblePins[:2])==True:
         pass
     
     stop()
@@ -70,8 +71,11 @@ try:
     wiring=True
     #note that this is depricated
     #initQTI(wiring)
-    lineTest()
-    movementTest()
+    #lineTest()
+    #movementTest()
+
+    handTest()
     #print 'test'
+	
 finally:
     stop()

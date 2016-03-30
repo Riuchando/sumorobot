@@ -5,6 +5,16 @@ import time
 #do some quick statistics to make sure the data is good,
 #note that this is giving data in seconds that should be in a degree of 10**-4
 #might write a coroutine that if enabled, will interrupt this process 
+def init():
+    GPIO.setmode(GPIO.BOARD)
+
+    TRIG=29
+    ECHO=31
+
+    GPIO.setup(TRIG,GPIO.OUT)
+    GPIO.output(TRIG,0)
+
+    GPIO.setup(ECHO,GPIO.IN)
 def takeMeasurement():
     GPIO.setmode(GPIO.BOARD)
 
@@ -31,7 +41,8 @@ def takeMeasurement():
     while GPIO.input(ECHO) ==1:
         pass
     stop=time.time()
-    print (stop - start ) * 17000
+    #print stop - start
+    return (stop - start ) * 17000
 
 def main():
     try:
@@ -39,4 +50,5 @@ def main():
             takeMeasurement()
     finally:
         GPIO.cleanup()
-main()
+#main()
+

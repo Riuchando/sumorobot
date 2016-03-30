@@ -172,4 +172,4 @@ def movementTest():
     #stop()
   finally:
     stop()
-movementTest()
+#movementTest()
