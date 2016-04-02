@@ -7,7 +7,7 @@ upperLeft=mh.getMotor(1)
 upperRight=mh.getMotor(2)
 lowerLeft=mh.getMotor(3)
 lowerRight=mh.getMotor(4)
-def forward(speed =50, timeout=5):
+def back(speed =100, timeout=5,accel=20):
   #there is a built in library 0 255
   #essentially follow the model
   #note might need to do some fancy math to error correct for the difference in the motors
@@ -21,7 +21,7 @@ def forward(speed =50, timeout=5):
   #slowly accellerate the motors so they aren't jerky,
   #think of someone constantly stopping and starting car
   
-  for i in range(speed)[::2]:
+  for i in range(speed)[::accel]:
     upperLeft.setSpeed(i)
     upperRight.setSpeed(i)
     lowerLeft.setSpeed(i)
@@ -42,7 +42,7 @@ def forward(speed =50, timeout=5):
   
   
 
-def turnLeft(speed =5, angle=30, sharpness = 0,untilStop=False):
+def turnRight(speed =5, angle=30, sharpness = 0,untilStop=False, accel=20):
   #depending on the output for compass sensor,
   #figure out Radians or Degrees
   #also write some simple algos to have the ultra sonic sensor help where the thing is
@@ -56,18 +56,18 @@ def turnLeft(speed =5, angle=30, sharpness = 0,untilStop=False):
   #while abs(compass.reading()- 10) <= angle:
   # keep moving...
   #stop()
-  for i in range(speed):
+  for i in range(speed)[::accel]:
     upperLeft.setSpeed(i)
     upperRight.setSpeed(i)
     lowerLeft.setSpeed(i)
     lowerRight.setSpeed(i)
-    if getRC(3) or getRC(4):
-      stop(0)
-      forward(speed)
-    time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
+    #if getRC(3) or getRC(4):
+    #  stop(0)
+    #  forward(speed)
+    #time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
   #pass
 
-def turnRight(speed =5, angle=30,sharpness = 0,untilStop=False,accel=10):
+def turnLeft(speed =5, angle=30,sharpness = 0,untilStop=False,accel=10):
   #same as turn left, figure out Radians or Degrees
   if speed > 255 or speed < 0:
     return # do nothing for now, write error message at some point
@@ -113,7 +113,7 @@ def oneWheelTime(speed=255, accel=10):
   #stop()
       
       
-def back(speed =255,accel=10):
+def forward(speed =255,accel=10,driftRatio=1):
   #the same with the forward
   #need to set up the detection on seeing if the motors can be run in parellel
   if speed > 255 or speed < 0:
@@ -123,13 +123,13 @@ def back(speed =255,accel=10):
   lowerLeft.run(Adafruit_MotorHAT.BACKWARD)
   lowerRight.run(Adafruit_MotorHAT.BACKWARD)
   for i in range(speed)[::accel]:
-    print i
+    #print i
     upperLeft.setSpeed(i)
-    upperRight.setSpeed(i)
+    upperRight.setSpeed(i*driftRatio)
     lowerLeft.setSpeed(i)
-    lowerRight.setSpeed(i)
-   # if 
-    time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
+    lowerRight.setSpeed(i*driftRatio)
+    
+    #time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
 
 def stop(speed=0):
   #decellerates, then stops
@@ -143,7 +143,7 @@ def stop(speed=0):
   lowerLeft.run(Adafruit_MotorHAT.RELEASE)
   lowerRight.run(Adafruit_MotorHAT.RELEASE)
   # optional sleep to make reduce jerkiness
-  time.sleep(1.0)
+  #time.sleep(1.0)
   
 def redirect(direction):
   # quick 90 degree turn (will need some code to figure out which one) need to enable sensors for detection

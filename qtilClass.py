@@ -15,12 +15,15 @@ class qtiWrapper:
         self.sd=0 #try to calculate sd only once
         #self.pin=pin
         self.rightTail=0
-	self.cap=700
+	self.cap=20
         #might put initQTI here
-        self.initQTI(wiring)
-        #might make it so it will be able to hold multiple pins
-        #might put a gather sample data here
-        #self.gatherSample(pin=18)
+	if wiring==True:
+            self.initQTI(wiring)
+            #might make it so it will be able to hold multiple pins
+            #might put a gather sample data here
+        else:
+	    GPIO.setmode(GPIO.BOARD)
+        self.gatherSample(pin=18,wiring=wiring)
         
     def upMean(self):
         #print self.sample
@@ -98,18 +101,18 @@ class qtiWrapper:
             GPIO.setup(pin,GPIO.OUT)
             #set pin to high to discharge capacitor
             
-            GPIO.output(pin,1)
+            GPIO.output(pin,GPIO.LOW)
             #wait 1 ms
             time.sleep(0.1)
             #make pin Input
-            #GPIO.setup(pin,GPIO.IN)
-            GPIO.setup(pin,GPIO.IN,GPIO.PUD_DOWN)
+            GPIO.setup(pin,GPIO.IN)
+            #GPIO.setup(pin,GPIO.IN,GPIO.PUD_DOWN)
             #turn off internal pullups
-            while True:
+            while GPIO.input(pin)== GPIO.LOW:
                 #wait for the pin to go Low
                 #print GPIO.input(sensorIn)
                 duration+=1
-	print duration, pin
+	#print duration, pin
         return duration
     #note that the variagble of wiring might be put everywhere
     #at this point, I think I'll stick to wiringpi2 over GPIO, but I won't know
@@ -161,17 +164,23 @@ class qtiWrapper:
     #changing this to allow for testing with dark background with light
     def detect(self,pin,short=False,wiring=True):
         if short==True:
-		return self.RCTime(pin,wiring=wiring,short=short) == self.rightTail
+		return self.RCTime(pin=pin,wiring=wiring,short=short) == self.rightTail
 	else:
 		#change this later to make sense for common applications
-		return self.RCTime(pin,wiring=wiring,short=short) == self.cap
-		#print t,pin
-		
+		t=self.RCTime(pin=pin,wiring=wiring,short=short)
+		print t, pin,self.cap
+		# to reinforce the idea that the data is clean
+		return t>=self.cap if self.rightTail !=0 else t>= self.rightTail
     #I suppose I could have made this a complicated if statement, the idea is to check different configurations of qtipins at the same time
     #it has error handling of list size of 1, which doesn't have a nice reduce statement because of infix notation
-    def detectList(self,pinList):
-        if len(pinList)>1:
-            return reduce(lambda x,y: self.detect(x) and self.detect(y), pinList)
+    def detectList(self,pinList,wiring=True,newmethod=True ):
+        if newmethod==True:
+	    for pin in pinList:
+		if self.detect(pin,wiring=wiring) == True:
+		    return True
+	    return False
+	if len(pinList)>1:
+            return reduce(lambda x,y: self.detect(pin=x,wiring=wiring) or self.detect(pin=y,wiring=wiring), pinList)
         elif len(pinList) ==1:
             return self.detect(pinList[0])
         else:

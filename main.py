@@ -1,11 +1,14 @@
+#import RPi.GPIO as GPIO, time
+#from  qtitest import RCtime
+#import RPI.GPIO as GPIO, time
 import time
 from movement import *
 #from qtiLineSensor import *
 from qtilClass import *
 from sonar import takeMeasurement
-
+#import qtites
 def init():
-    time.sleep(5)
+    time.sleep(115)
     initQTI(2)
 
 
@@ -23,8 +26,8 @@ def allSensorsTest():
         tm=takeMeasurement()
 
     
-    stop(speed=255)
-    forward(speed=255)
+    stop(speed=50)
+    forward(speed=5)
     #check the front two pins
     while RCTime(pin=11) and RCTime(pin=13):
         print 'wait'
@@ -36,7 +39,7 @@ def allSensorsTest():
 
 #move forward 
 def handTest():
-    back(speed=100,accel=10)
+    back(speed=100,accel=15)
     tm=takeMeasurement()
     print tm
     #there gets some errors when it gets too close
@@ -46,35 +49,81 @@ def handTest():
     #forward(speed=255, )
     stop()    
 
-def lineTest():
-    #forward(speed=25)
-    back(speed=50)
-    possiblePins=[11,13,16,18]
-    #for possible in possiblePins:
-    #    print 'pin ', str(possible), ' : ' , RCTime(possible)
-    #print 'pin 11 : ' , RCTime(11), ' pin 13 : ', RCTime(13)
-    t=qtiWrapper()
-    
-    while t.detectList(possiblePins)==True:
+def detectBoxTest():
+    turnLeft(speed=70,accel=10)
+    sonarDist=takeMeasurement()
+    pins=[11,13,16,18]
+    #print sonarDist
+    while sonarDist> 40:
+	sonarDist=takeMeasurement()
+	print sonarDist
+    stop()
+    forward(speed=70)    
+    qtiPins=qtiWrapper(wiring=False)
+    while qtiPins.detectList(pins[:2],wiring=False)==False:
 	pass
-
-    forward(speed=50)
+    stop()
+def linetest():
+    
+    pins=[11,13,16,18]
+    forward(speed=50,accel=10) 
+    t=qtiWrapper(wiring=False)    
+    detect=t.detect(11,wiring=False)
+    while t.detectList(pinList=pins,wiring=False)==False:
+	#detect=t.detectList(pins,wiring=False)
+	pass
     #back(speed=25)
     #busy wait until the sensors detect something
-    while t.detectList(possiblePins[:2])==True:
-        pass
+    # while (RCtime :wq
+
+    #print "Passed white line"
     
     stop()
     time.sleep(0.5)
 
+def turnSampleRate():
+    sample=[]
+    turnLeft(speed=70,accel=5)
+    sonarDist=takeMeasurement()
+    detected=False
+    while detected==False:
+        while sonarDist>30:
+            sonarDist=takeMeasurement()
+	    #I could bump it up to 32 and make it bit shifted but w/e
+	    if len(sample)> 30:
+	        mean=sum(sample)/30
+	    else:
+	        sample.append(sonarDist)
+        #reorganise code into a class so that I can slow down rather than needing to stop
+        stop()
+        turnLeft(speed=50)
+        newDist=takeMeasurement()
+        if newDist < sonarDist:
+	   forward(speed=100)
+	   detected=True
+    t=qtiWrapper(wiring=False)
+    while newDist < sonarDist:
+	forward(speed=70,driftRatio=1.5) 
+        if t.detectList(pinList=pins,wiring=False)==False:
+        #detect=t.detectList(pins,wiring=False)
+            stop()
+	    return
+	newDist=sonarDist
+	sonarDist=takeMeasurement
+    
+    stop()
+    #else:
+    #loop back to the above while loop, need to edit this as soon as I get home
+    #stop()
 try:
-    wiring=True
+    #wiring=True
     #note that this is depricated
     #initQTI(wiring)
-    #lineTest()
+    #linetest()
+    turnSampleRate()
     #movementTest()
-
-    handTest()
+    #detectBoxTest()
+    #handTest()
     #print 'test'
 	
 finally:
