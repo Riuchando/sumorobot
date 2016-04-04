@@ -168,7 +168,7 @@ class qtiWrapper:
 	else:
 		#change this later to make sense for common applications
 		t=self.RCTime(pin=pin,wiring=wiring,short=short)
-		print t, pin,self.cap
+		#print t, pin,self.cap
 		# to reinforce the idea that the data is clean
 		return t>=self.cap if self.rightTail !=0 else t>= self.rightTail
     #I suppose I could have made this a complicated if statement, the idea is to check different configurations of qtipins at the same time

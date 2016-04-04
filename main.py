@@ -50,15 +50,15 @@ def handTest():
     stop()    
 
 def detectBoxTest():
-    turnLeft(speed=70,accel=10)
+    turnLeft(speed=250,accel=15)
     sonarDist=takeMeasurement()
     pins=[11,13,16,18]
-    #print sonarDist
+    print sonarDist
     while sonarDist> 40:
 	sonarDist=takeMeasurement()
 	print sonarDist
     stop()
-    forward(speed=70)    
+    forward(speed=100)    
     qtiPins=qtiWrapper(wiring=False)
     while qtiPins.detectList(pins[:2],wiring=False)==False:
 	pass
@@ -120,9 +120,9 @@ try:
     #note that this is depricated
     #initQTI(wiring)
     #linetest()
-    turnSampleRate()
+    #turnSampleRate()
     #movementTest()
-    #detectBoxTest()
+    detectBoxTest()
     #handTest()
     #print 'test'
 	

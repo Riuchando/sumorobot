@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 import RPi.GPIO as GPIO
 import time
 #will need to start a thread that has this in a while loop and stores the data in a buffer
