@@ -9,7 +9,7 @@ GPIO.setmode(GPIO.BOARD)
 
 # Define function to measure charge time
 def RCtime (PiPin):
- 
+
   measurement = 0
   # Discharge capacitor
   GPIO.setup(PiPin, GPIO.OUT)
@@ -26,7 +26,7 @@ def RCtime (PiPin):
 
 # Main program loop
 #if  True:
-back(speed=70)   
+back(speed=70)
 while True:
    pins=[11,13,16,18]
    GPIOS=[17,27,23,24]
@@ -35,4 +35,4 @@ while True:
 	stop()
 	break
 stop()
- # print RCtime(4) # Measure timing using GPI04
+# print RCtime(4) # Measure timing using GPI04

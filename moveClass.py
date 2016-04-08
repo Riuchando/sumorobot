@@ -10,7 +10,7 @@ class motors():
     self.upperRight=self.mh.getMotor(2)
     self.lowerLeft=self.mh.getMotor(3)
     self.lowerRight=self.mh.getMotor(4)
-    self.motorSpeed=[0,0,0,0]
+    self.motorSpeed=[0,0]
   #might have it work similarly to forward
   def back(self,speed =100,accel=20):
     #there is a built in library 0 255
@@ -111,6 +111,7 @@ class motors():
       for i in range(motorSpeed[1],speed)[::accel]:
         self.upperLeft.setSpeed(i)
         self.lowerLeft.setSpeed(i)
+
       self.motorSpeed=[speed*driftRatio,speed]
 
 

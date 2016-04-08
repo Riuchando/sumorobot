@@ -2,13 +2,13 @@
 import RPi.GPIO as GPIO
 import time
 import math
-class sonar():
+class sonarWrapper():
   #will need to start a thread that has this in a while loop and stores the data in a buffer
   #do some quick statistics to make sure the data is good,
   #note that this is giving data in seconds that should be in a degree of 10**-4
   #might write a coroutine that if enabled, will interrupt this process
   def init(self):
-      GPIO.setmode(GPIO.BOARD)
+      #GPIO.setmode(GPIO.BOARD)
       #pin numbers
       self.TRIG=29
       self.ECHO=31

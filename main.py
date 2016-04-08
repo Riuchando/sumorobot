@@ -25,7 +25,7 @@ def allSensorsTest():
         print 'wait'
         tm=takeMeasurement()
 
-    
+
     stop(speed=50)
     forward(speed=5)
     #check the front two pins
@@ -37,7 +37,7 @@ def allSensorsTest():
     turnRight(speed =1, angle=180,sharpness=50)
     stop(speed=20)
 
-#move forward 
+#move forward
 def handTest():
     back(speed=100,accel=15)
     tm=takeMeasurement()
@@ -47,7 +47,7 @@ def handTest():
         print tm
         tm=takeMeasurement()
     #forward(speed=255, )
-    stop()    
+    stop()
 
 def detectBoxTest():
     turnLeft(speed=250,accel=15)
@@ -55,29 +55,29 @@ def detectBoxTest():
     pins=[11,13,16,18]
     print sonarDist
     while sonarDist> 40:
-	sonarDist=takeMeasurement()
-	print sonarDist
+    	sonarDist=takeMeasurement()
+  	print sonarDist
     stop()
-    forward(speed=100)    
+    forward(speed=100)
     qtiPins=qtiWrapper(wiring=False)
     while qtiPins.detectList(pins[:2],wiring=False)==False:
-	pass
+	    pass
     stop()
 def linetest():
-    
+
     pins=[11,13,16,18]
-    forward(speed=50,accel=10) 
-    t=qtiWrapper(wiring=False)    
+    forward(speed=50,accel=10)
+    t=qtiWrapper(wiring=False)
     detect=t.detect(11,wiring=False)
     while t.detectList(pinList=pins,wiring=False)==False:
 	#detect=t.detectList(pins,wiring=False)
 	pass
     #back(speed=25)
     #busy wait until the sensors detect something
-    # while (RCtime :wq
+    # while (RCtime
 
     #print "Passed white line"
-    
+
     stop()
     time.sleep(0.5)
 
@@ -89,28 +89,28 @@ def turnSampleRate():
     while detected==False:
         while sonarDist>30:
             sonarDist=takeMeasurement()
-	    #I could bump it up to 32 and make it bit shifted but w/e
-	    if len(sample)> 30:
-	        mean=sum(sample)/30
-	    else:
-	        sample.append(sonarDist)
-        #reorganise code into a class so that I can slow down rather than needing to stop
-        stop()
-        turnLeft(speed=50)
-        newDist=takeMeasurement()
-        if newDist < sonarDist:
-	   forward(speed=100)
-	   detected=True
+            #I could bump it up to 32 and make it bit shifted but w/e
+            if len(sample)> 30:
+                mean=sum(sample)/30
+            else:
+                sample.append(sonarDist)
+              #reorganise code into a class so that I can slow down rather than needing to stop
+          stop()
+          turnLeft(speed=50)
+          newDist=takeMeasurement()
+          if newDist < sonarDist:
+	         forward(speed=100)
+	         detected=True
     t=qtiWrapper(wiring=False)
     while newDist < sonarDist:
-	forward(speed=70,driftRatio=1.5) 
+	    forward(speed=70,driftRatio=1.5)
         if t.detectList(pinList=pins,wiring=False)==False:
         #detect=t.detectList(pins,wiring=False)
             stop()
 	    return
-	newDist=sonarDist
-	sonarDist=takeMeasurement
-    
+	  newDist=sonarDist
+	  sonarDist=takeMeasurement()
+
     stop()
     #else:
     #loop back to the above while loop, need to edit this as soon as I get home
@@ -125,6 +125,6 @@ try:
     detectBoxTest()
     #handTest()
     #print 'test'
-	
+
 finally:
     stop()
