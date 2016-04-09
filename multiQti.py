@@ -1,11 +1,12 @@
+#!/usr/bin/python
 from multiprocessing import Pipe,Process
 from qtilClass import *
 #from sonar import takeMeasurement
 from sonarClass import *
 from moveClass import *
-import RPi.GPIO as GPIO 
+import RPi.GPIO as GPIO
 import time
-
+import Queue
 
 def toMain(toMainPipe,fromMainPipe):
     #just seeing if this will work
@@ -38,42 +39,37 @@ def main():
     recv.close()
 
 #parallel processing qti sensor
-def eachSensor(pipe,pin,qtiref):
-    toMainPipe, fromMainPipe= pipe
+def eachSensor(q,pin,qtiref):
+    #toMainPipe, fromMainPipe= pipe
     #qtiref=qtiWrapper(wiring=False)
     while True:
       if qtiref.detect(pin, wiring=False)==True:
-          toMainPipe.send(pin)
+          #toMainPipe.send(pin)
+          q.put(pin)
 
-
-def sonarMulti(pipe,sonarRef):
-    toMainPipe, fromMainPipe= pipe
+def sonarMulti(q,sonarRef):
+    #toMainPipe, fromMainPipe= pipe
     while True:
-	tm=sonarRef.takeMeasurement()
+	    tm=sonarRef.takeMeasurement()
     	#print tm
         if tm <30:
-           toMainPipe.send(tm)
+           q.send(tm)
 
 
 def multiMain():
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(7,GPIO.IN)
-   
-
-    while GPIO.input(7)==0:
-	print 'wait'
-
-    time.sleep(5) 
-    send, recv=Pipe()
+    #I read that pipe is faster, but the signal kill was too obtuse
+    q=multiprocessing.Queue()
+    #time.sleep(5)
+    #send, recv=Pipe()
     pins=[11,13,16,18]
     #pool=Pool=(processes=4)
     m=motors()
-    
-        
+
+
     #m.turnLeft(speed=100)
     qtiref=qtiWrapper(wiring=False)
+    #workers=[Process(target=eachSensor, args=((send,recv),pin, qtiref) )  for pin in pins]
     workers=[Process(target=eachSensor, args=((send,recv),pin, qtiref) )  for pin in pins]
-
     #GPIO.setmode(GPIO.BOARD)
     #GPIO.setup(7,GPIO.IN)
     #for worker in workers:
@@ -81,39 +77,52 @@ def multiMain():
     #while GPIO.input(7) == 0:
     #    print 'wait'
     # 	pass
-    
+
     #time.sleep(5)
     for worker in workers:
-	worker.start()
-    m.turnLeft(speed=100,accel=-1)
-    sonarRef=sonarWrapper()
+	    worker.start()
+    m.turnLeft(speed=200,accel=-1)
+
     sonar=Process(target=sonarMulti,args=((send,recv),sonarRef))
     sonar.start()
-    
+
     prev=-1
     while True:
-	    msg=recv.recv()
-	    #print msg
-            if isinstance(msg ,float):
-		#this means that it is from the sonar instead of from the qti
-		#stop()
-		if prev> msg:
-		    m.forward(speed=100,driftRatio=1.2)
-		else:
-		    m.forward(speed=250)
-		prev=msg
-            #interrupt signal, make sure that this is accurrate
-            if msg==13 or msg ==11:
-		stop()
-                break
-	    
+      #msg=recv.recv()
+      try:
+	      msg=q.get(True, 3)
+  	    #print msg
+      except Queue.Empty:
+        print "TIMEOUT"
+        m.stop()
+        return
+      if isinstance(msg ,float):
+		    #this means that it is from the sonar instead of from the qti
+		    #stop()
+		    if prev> msg:
+		      m.forward(speed=200,driftRatio=1.2)
+    		else:
+		      m.forward(speed=250)
+  		    prev=msg
+      #interrupt signal, make sure that this is accurrate
+      if msg==13 or msg ==11:
+          m.stop()
+          m.back(speed=250)
+          time.sleep(0.0001)
+          m.turnLeft(speed=255,accel=-1)
+          time.sleep(0.0001)
+          m.forward(speed=250)
 
-    
+
+
     #close Program
     for worker in workers:
 	    worker.join()
+      #hopefully this is not problem so here's an alternative
+      worker.terminate()
 
     sonar.join()
+    worker.terminate()
     send.close()
     recv.close()
 
@@ -129,8 +138,14 @@ def sonarMain():
     recv.close()
 
 
-
+def entireWrapper():
+    sonarRef=sonarWrapper()
+    while True:
+      if sonarRef.takeMeasurement(sonarRef) >30:
+        time.sleep(5)
+        multiMain()
 
 #sonarMain()
-multiMain()
+#multiMain()
+entireWrapper()
 #main()
