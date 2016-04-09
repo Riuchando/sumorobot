@@ -39,7 +39,7 @@ def allSensorsTest():
 
 #move forward
 def handTest():
-    back(speed=100,accel=15)
+    back(speed=255,accel=15)
     tm=takeMeasurement()
     print tm
     #there gets some errors when it gets too close
@@ -53,20 +53,28 @@ def detectBoxTest():
     turnLeft(speed=250,accel=15)
     sonarDist=takeMeasurement()
     pins=[11,13,16,18]
-    print sonarDist
+    #print sonarDist
     while sonarDist> 40:
     	sonarDist=takeMeasurement()
-  	print sonarDist
+  	#print sonarDist
     stop()
-    forward(speed=100)
+    forward(speed=255 )
     qtiPins=qtiWrapper(wiring=False)
-    while qtiPins.detectList(pins[:2],wiring=False)==False:
-	    pass
-    stop()
+    while True:
+    	while qtiPins.detectList(pins[:2],wiring=False)==False:
+        	forward(speed=250)
+		pass
+    
+    	stop()
+    	back(speed=250)
+    	turnLeft(speed=250)
+    	stop()
+    	forward(speed=250)
+    
 def linetest():
 
     pins=[11,13,16,18]
-    forward(speed=50,accel=10)
+    forward(speed=255,accel=10)
     t=qtiWrapper(wiring=False)
     detect=t.detect(11,wiring=False)
     while t.detectList(pinList=pins,wiring=False)==False:
@@ -83,7 +91,7 @@ def linetest():
 
 def turnSampleRate():
     sample=[]
-    turnLeft(speed=70,accel=5)
+    turnLeft(speed=255,accel=5)
     sonarDist=takeMeasurement()
     detected=False
     while detected==False:
@@ -94,22 +102,22 @@ def turnSampleRate():
                 mean=sum(sample)/30
             else:
                 sample.append(sonarDist)
-              #reorganise code into a class so that I can slow down rather than needing to stop
-          stop()
-          turnLeft(speed=50)
-          newDist=takeMeasurement()
-          if newDist < sonarDist:
-	         forward(speed=100)
-	         detected=True
-    t=qtiWrapper(wiring=False)
-    while newDist < sonarDist:
-	    forward(speed=70,driftRatio=1.5)
-        if t.detectList(pinList=pins,wiring=False)==False:
-        #detect=t.detectList(pins,wiring=False)
-            stop()
-	    return
-	  newDist=sonarDist
-	  sonarDist=takeMeasurement()
+        #reorganise code into a class so that I can slow down rather than needing to stop
+        stop()
+        turnLeft(speed=255)
+        newDist=takeMeasurement()
+        if newDist < sonarDist:
+	    forward(speed=255)
+	    detected=True
+        t=qtiWrapper(wiring=False)
+        while newDist < sonarDist:
+	    forward(speed=255,driftRatio=1.5)
+            if t.detectList(pinList=pins,wiring=False)==False:
+                #detect=t.detectList(pins,wiring=False)
+                stop()
+	        return
+	    newDist=sonarDist
+	    sonarDist=takeMeasurement()
 
     stop()
     #else:

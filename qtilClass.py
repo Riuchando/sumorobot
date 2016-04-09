@@ -23,7 +23,7 @@ class qtiWrapper:
             #might put a gather sample data here
         else:
 	    GPIO.setmode(GPIO.BOARD)
-        self.gatherSample(pin=18,wiring=wiring)
+        #self.gatherSample(pin=18,wiring=wiring)
         
     def upMean(self):
         #print self.sample

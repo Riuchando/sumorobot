@@ -27,6 +27,8 @@ class sonarWrapper():
 
 
   def takeMeasurement(self):
+      self.TRIG=29
+      self.ECHO=31
       GPIO.setup(self.TRIG,GPIO.OUT)
       GPIO.output(self.TRIG,0)
 
@@ -56,7 +58,7 @@ class sonarWrapper():
           while len(self.sample) < self.sampleSize:
             sonarDist=self.takeMeasurement()
             self.sample.append(sonarDist)
-            if sonarDist < self.goodReading
+            if sonarDist < self.goodReading:
               self.detected =True
               self.sonarLoop() #exit this
           #when I have enough samples
@@ -68,7 +70,7 @@ class sonarWrapper():
         #assume that a good reading is more accurate for now
         while True:
           sonarDist= self.takeMeasurement()
-          if sonarDist < self.goodReading
+          if sonarDist < self.goodReading:
               self.detected =True
               self.sonarLoop() #exit this
 

@@ -47,7 +47,7 @@ def takeMeasurement():
 def main():
     try:
         while True:
-            takeMeasurement()
+            print takeMeasurement()
     finally:
         GPIO.cleanup()
 #main()

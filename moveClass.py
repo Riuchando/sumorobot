@@ -86,10 +86,10 @@ class motors():
     #need to set up the detection on seeing if the motors can be run in parellel
     if speed > 255 or speed < 0:
         return # do nothing for now, write error message at some point
-      self.upperLeft.run(Adafruit_MotorHAT.BACKWARD)
-      self.upperRight.run(Adafruit_MotorHAT.BACKWARD)
-      self.lowerLeft.run(Adafruit_MotorHAT.BACKWARD)
-      self.lowerRight.run(Adafruit_MotorHAT.BACKWARD)
+    self.upperLeft.run(Adafruit_MotorHAT.BACKWARD)
+    self.upperRight.run(Adafruit_MotorHAT.BACKWARD)
+    self.lowerLeft.run(Adafruit_MotorHAT.BACKWARD)
+    self.lowerRight.run(Adafruit_MotorHAT.BACKWARD)
     if driftRatio ==1:
       for i in range(motorSpeed[0],speed*driftRatio)[::accel]:
         self.upperRight.setSpeed(i)

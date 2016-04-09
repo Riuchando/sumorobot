@@ -3,6 +3,9 @@ from qtilClass import *
 #from sonar import takeMeasurement
 from sonarClass import *
 from moveClass import *
+import RPi.GPIO as GPIO 
+import time
+
 
 def toMain(toMainPipe,fromMainPipe):
     #just seeing if this will work
@@ -46,34 +49,66 @@ def eachSensor(pipe,pin,qtiref):
 def sonarMulti(pipe,sonarRef):
     toMainPipe, fromMainPipe= pipe
     while True:
-	    tm=sonarRef.takeMeasurement()
+	tm=sonarRef.takeMeasurement()
     	#print tm
-      if tm <30:
-          toMainPipe.send(tm)
+        if tm <30:
+           toMainPipe.send(tm)
 
 
 def multiMain():
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(7,GPIO.IN)
+   
+
+    while GPIO.input(7)==0:
+	print 'wait'
+
+    time.sleep(5) 
     send, recv=Pipe()
     pins=[11,13,16,18]
     #pool=Pool=(processes=4)
+    m=motors()
+    
+        
+    #m.turnLeft(speed=100)
     qtiref=qtiWrapper(wiring=False)
     workers=[Process(target=eachSensor, args=((send,recv),pin, qtiref) )  for pin in pins]
 
+    #GPIO.setmode(GPIO.BOARD)
+    #GPIO.setup(7,GPIO.IN)
+    #for worker in workers:
+    #    worker.start()
+    #while GPIO.input(7) == 0:
+    #    print 'wait'
+    # 	pass
+    
+    #time.sleep(5)
     for worker in workers:
-	    worker.start()
-
+	worker.start()
+    m.turnLeft(speed=100,accel=-1)
     sonarRef=sonarWrapper()
     sonar=Process(target=sonarMulti,args=((send,recv),sonarRef))
     sonar.start()
-
-
+    
+    prev=-1
     while True:
 	    msg=recv.recv()
 	    #print msg
-      #interrupt signal, make sure that this is accurrate
-      if msg==13 or msg ==11:
-          break
+            if isinstance(msg ,float):
+		#this means that it is from the sonar instead of from the qti
+		#stop()
+		if prev> msg:
+		    m.forward(speed=100,driftRatio=1.2)
+		else:
+		    m.forward(speed=250)
+		prev=msg
+            #interrupt signal, make sure that this is accurrate
+            if msg==13 or msg ==11:
+		stop()
+                break
+	    
 
+    
     #close Program
     for worker in workers:
 	    worker.join()
@@ -97,5 +132,5 @@ def sonarMain():
 
 
 #sonarMain()
-#multiMain()
+multiMain()
 #main()

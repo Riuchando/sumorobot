@@ -156,7 +156,7 @@ def redirect(direction):
   forward(speed=50)
 def movementTest():
   try:
-    forward(25)
+    forward(75)
     time.sleep(1)
     stop()
     #back(255)
@@ -172,4 +172,4 @@ def movementTest():
     #stop()
   finally:
     stop()
-#movementTest()
+movementTest()
