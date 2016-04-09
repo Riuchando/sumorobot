@@ -15,7 +15,7 @@ class qtiWrapper:
         self.sd=0 #try to calculate sd only once
         #self.pin=pin
         self.rightTail=0
-	self.cap=20
+        self.cap=30
         #might put initQTI here
 	if wiring==True:
             self.initQTI(wiring)
@@ -163,14 +163,15 @@ class qtiWrapper:
     #or should be a single bool that takes appx 776 ns to calculate
     #changing this to allow for testing with dark background with light
     def detect(self,pin,short=False,wiring=True):
-        if short==True:
-		return self.RCTime(pin=pin,wiring=wiring,short=short) == self.rightTail
-	else:
-		#change this later to make sense for common applications
-		t=self.RCTime(pin=pin,wiring=wiring,short=short)
-		#print t, pin,self.cap
-		# to reinforce the idea that the data is clean
-		return t>=self.cap if self.rightTail !=0 else t>= self.rightTail
+         if short==True:
+             return self.RCTime(pin=pin,wiring=wiring,short=short) == self.rightTail
+         else:
+			#change this later to make sense for common applications
+			t=self.RCTime(pin=pin,wiring=wiring,short=short)
+			print t, pin
+			# to reinforce the idea that the data is clean
+			#return t>=self.cap if self.rightTail !=0 else t>= self.rightTail
+			return t>=self.cap
     #I suppose I could have made this a complicated if statement, the idea is to check different configurations of qtipins at the same time
     #it has error handling of list size of 1, which doesn't have a nice reduce statement because of infix notation
     def detectList(self,pinList,wiring=True,newmethod=True ):
