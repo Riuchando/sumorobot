@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#THIS IS THE OLD VERSION YOU WANT TO GET RID OF
 #using the gpio tutorial from parallax.com note that this is the python translation of the arduino code
 #if you are someone else, you only need wiringpi2
 #and if you are a beginner, that is sudo pip install wiringpi2
@@ -17,14 +18,14 @@ class qtiWrapper:
         self.rightTail=0
         self.cap=30
         #might put initQTI here
-	if wiring==True:
+	      if wiring==True:
             self.initQTI(wiring)
             #might make it so it will be able to hold multiple pins
             #might put a gather sample data here
         else:
 	    GPIO.setmode(GPIO.BOARD)
         #self.gatherSample(pin=18,wiring=wiring)
-        
+
     def upMean(self):
         #print self.sample
         self.mu=sum(self.sample)/len(self.sample)
@@ -32,7 +33,7 @@ class qtiWrapper:
         #print self.sd
         self.rightTail=int(self.mu+2*self.sd)
         #print self.rightTail
-        
+
     def initQTI(self,wiring=True):
         #pin = pinNum
         if wiring == True:
@@ -41,8 +42,8 @@ class qtiWrapper:
             wp.wiringPiSetupPhys()
         else:
             GPIO.setmode(GPIO.BOARD)
-    #IGNORE THIS    
-    def initRC(self,pin):    
+    #IGNORE THIS
+    def initRC(self,pin):
         #make pin output
         wp.pinMode(pin,1)
         #set pin to high to discharge capacitor
@@ -50,23 +51,23 @@ class qtiWrapper:
         #wait 1 ms
         #time.sleep(0.1)
         #make pin Input
-        wp.pinMode(pin,0)    
+        wp.pinMode(pin,0)
         #turn off internal pullups
         #wp.digitalWrite(pin,0)
-        
-        
+
+
     #this will get a singe reading, maybe need to figure out how threading works
     #and try to make something clever if not put this in a while loop
     def getRC(self,pin=11):
         return wp.digitalRead(pin)
-            
+
 
     #find a way to start up a thread that periodically checked this and stores it in a buffer
     #then do some quick statistics to make sure a single bad reading doens't throw this off
     #ABANDON THIS
     #maybe not, this code is messy as hell at the moment
     def RCTime(self,pin=11,wiring=True,short=False):
-        duration=0    
+        duration=0
         #not sure if the GPIO version of this translation works,
         #so keep using Wiringpi version
         if wiring==True:
@@ -78,7 +79,7 @@ class qtiWrapper:
             #wait 1 ms
             time.sleep(0.001)
             #make pin Input
-            wp.pinMode(pin,0)    
+            wp.pinMode(pin,0)
             #turn off internal pullups
             #wp.digitalWrite(pin,0)
             wp.pullUpDnControl(pin,1)
@@ -90,17 +91,17 @@ class qtiWrapper:
                     #print 'not yet'
                     duration+=1
             else:
-                while wp.digitalRead(pin)==1 and duration <self.cap: 
+                while wp.digitalRead(pin)==1 and duration <self.cap:
 		#           	while wp.digitalRead(pin)==1:
 			#print "here"
 			duration+=1
-            #print duration 
+            #print duration
 	    #wp.pinMode(pin,1)
             #wp.digitalWrite(pin,1)
         else:
             GPIO.setup(pin,GPIO.OUT)
             #set pin to high to discharge capacitor
-            
+
             GPIO.output(pin,GPIO.LOW)
             #wait 1 ms
             time.sleep(0.1)
@@ -120,13 +121,13 @@ class qtiWrapper:
         while len(self.sample)< 30:
             self.sample.append(self.RCTime(pin=pin,wiring=wiring, short =False))
         self.upMean()
-    
+
     def getAllTest(self):
 	pins=[11,13,16,18]
-	while True: 
+	while True:
 	    for pin in pins:
                 print pin,self.RCTime(pin=pin, wiring=True)
-		time.sleep(1)       
+		time.sleep(1)
     #this is just a test for the wiring, it prints out to the main screen
     def main(self):
         try:
@@ -136,7 +137,7 @@ class qtiWrapper:
             #so for now just use the wiringpi2 library as seen here
             wiring=True
             self.initQTI(wiring)
-            
+
             while True:
                 #print '11 : ', RCTime(11,wiring)
                 time.sleep(0.1)
@@ -145,7 +146,7 @@ class qtiWrapper:
                 #print '18 : ',RCTime(18,wiring)
                 if len(self.sample) < 30:
                     #print self.RCTime(11,wiring)
-                    
+
                     self.sample.append(self.RCTime(pin=18,wiring=wiring, short =False))
                 elif len(self.sample) == 30:
                     self.sample.append(self.RCTime(pin=18,wiring=wiring, short =False))
@@ -153,11 +154,11 @@ class qtiWrapper:
                 else:
                     if self.RCTime(18,wiring=wiring,short=False) == self.rightTail:
                         print 'possible detection', self.sample
-                        
+
         finally:
             if wiring == False:
                 GPIO.cleanup()
-                
+
     #this will probably be the one for the actual data gathering from other
     #can't decide if this should have it's own infinite loop and be a separate process
     #or should be a single bool that takes appx 776 ns to calculate
@@ -187,7 +188,7 @@ class qtiWrapper:
         else:
             print 'I hope you know what you are doing, this is an empty list'
             return False
-            
+
 #x=qtiWrapper()
 #x.main()
 #x.getAllTest()

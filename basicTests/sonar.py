@@ -4,8 +4,14 @@ import time
 #will need to start a thread that has this in a while loop and stores the data in a buffer
 #do some quick statistics to make sure the data is good,
 #note that this is giving data in seconds that should be in a degree of 10**-4
-#might write a coroutine that if enabled, will interrupt this process 
+#might write a coroutine that if enabled, will interrupt this process
+
 def init():
+    '''
+      Input:
+      Output:
+        set up all the Pins
+    '''
     GPIO.setmode(GPIO.BOARD)
 
     TRIG=29
@@ -15,6 +21,7 @@ def init():
     GPIO.output(TRIG,0)
 
     GPIO.setup(ECHO,GPIO.IN)
+#use the speed of sound to find the distance between sensor and bot
 def takeMeasurement():
     GPIO.setmode(GPIO.BOARD)
 
@@ -45,6 +52,7 @@ def takeMeasurement():
     return (stop - start ) * 17000
 
 def main():
+    init()
     try:
         while True:
             print takeMeasurement()

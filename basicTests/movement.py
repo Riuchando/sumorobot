@@ -7,42 +7,41 @@ upperLeft=mh.getMotor(1)
 upperRight=mh.getMotor(2)
 lowerLeft=mh.getMotor(3)
 lowerRight=mh.getMotor(4)
-def back(speed =100, timeout=5,accel=20):
-  #there is a built in library 0 255
-  #essentially follow the model
-  #note might need to do some fancy math to error correct for the difference in the motors
+
+
+def back(speed =100,accel=20):
+  '''
+  Input:
+    speed: a number from 1-255 which sends a signal to the motor hat to the DC motor to a certain speed
+    accel: how fast do you want to reach the max speed
+  Output:
+    The motors move that speed
+  '''
   if speed > 255 or speed < 0:
     return # do nothing for now, write error message at some point
-  #initialize the direction of the motors
+  #initialize the direction of the motors, in our case it was backwards
   upperLeft.run(Adafruit_MotorHAT.FORWARD)
   upperRight.run(Adafruit_MotorHAT.FORWARD)
   lowerLeft.run(Adafruit_MotorHAT.FORWARD)
   lowerRight.run(Adafruit_MotorHAT.FORWARD)
   #slowly accellerate the motors so they aren't jerky,
   #think of someone constantly stopping and starting car
-  
+
   for i in range(speed)[::accel]:
     upperLeft.setSpeed(i)
     upperRight.setSpeed(i)
     lowerLeft.setSpeed(i)
     lowerRight.setSpeed(i)
-    #print 'here'
-    #if the upper right sensor detects the line
-  
-  #  if getRC(3):
-  #   stop(0)
-  #    turnLeft(speed=speed, angle=90, sharpness=90)
-  #  #if the upper left sensor detects the line
-  #  elif getRC(4):
-  #    stop(0)
-  #    turnRight(speed=speed, angle=90, sharpness=90)
-  #  time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
-  #note that we don't have a manual stop in here    
-  
-  
-  
 
-def turnRight(speed =5, angle=30, sharpness = 0,untilStop=False, accel=20):
+def turnRight(speed =5, accel=20):
+    '''
+  Input:
+    speed: a number from 1-255 which sends a signal to the motor hat to the DC motor to a certain speed
+    accel: how fast do you want to reach the max speed
+  Output:
+    The motors move that speed
+  '''
+
   #depending on the output for compass sensor,
   #figure out Radians or Degrees
   #also write some simple algos to have the ultra sonic sensor help where the thing is
@@ -52,29 +51,28 @@ def turnRight(speed =5, angle=30, sharpness = 0,untilStop=False, accel=20):
   upperRight.run(Adafruit_MotorHAT.FORWARD)
   lowerLeft.run(Adafruit_MotorHAT.BACKWARD)
   lowerRight.run(Adafruit_MotorHAT.FORWARD)
-  #make sure the library is imported from the compass
-  #while abs(compass.reading()- 10) <= angle:
-  # keep moving...
-  #stop()
   for i in range(speed)[::accel]:
     upperLeft.setSpeed(i)
     upperRight.setSpeed(i)
     lowerLeft.setSpeed(i)
     lowerRight.setSpeed(i)
-    #if getRC(3) or getRC(4):
-    #  stop(0)
-    #  forward(speed)
-    #time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
-  #pass
 
-def turnLeft(speed =5, angle=30,sharpness = 0,untilStop=False,accel=10):
-  #same as turn left, figure out Radians or Degrees
+def turnLeft(speed =5,accel=10):
+  '''
+  Input:
+    speed: a number from 1-255 which sends a signal to the motor hat to the DC motor to a certain speed
+    accel: how fast do you want to reach the max speed
+           NOTE: -1 is a special code that tells me that you want to get to maximum speed immediately, it was a hack
+  Output:
+    The motors move that speed
+  '''
   if speed > 255 or speed < 0:
     return # do nothing for now, write error message at some point
   upperLeft.run(Adafruit_MotorHAT.FORWARD)
   upperRight.run(Adafruit_MotorHAT.BACKWARD)
   lowerLeft.run(Adafruit_MotorHAT.FORWARD)
   lowerRight.run(Adafruit_MotorHAT.BACKWARD)
+
   if accel != -1:
     for i in range(speed)[::accel]:
       upperLeft.setSpeed(i)
@@ -86,15 +84,22 @@ def turnLeft(speed =5, angle=30,sharpness = 0,untilStop=False,accel=10):
     upperRight.setSpeed(speed)
     lowerLeft.setSpeed(speed)
     lowerRight.setSpeed(speed)
-  #time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
-  if untilStop == True:
-    stop()
-  
+
+#this is a test to make each wheel is working, used for debugging if the wheels are put on correctly, if not, change the functions FORWARD to BACKWARD
+#the order is upperLeft, upperRight, lowerLeft, lowerRight
 def oneWheelTime(speed=255, accel=10):
+    '''
+  Input:
+    speed: a number from 1-255 which sends a signal to the motor hat to the DC motor to a certain speed
+    accel: how fast do you want to reach the max speed
+  Output:
+    The motors move that speed
+  '''
   upperLeft.run(Adafruit_MotorHAT.FORWARD)
   upperRight.run(Adafruit_MotorHAT.FORWARD)# the polarity is mixed up
   lowerLeft.run(Adafruit_MotorHAT.BACKWARD)# the polarity is mixed up
   lowerRight.run(Adafruit_MotorHAT.FORWARD)# the polarity is mixed up
+
   for i in range(speed)[::accel]:
       upperLeft.setSpeed(i)
   time.sleep(1)
@@ -111,10 +116,16 @@ def oneWheelTime(speed=255, accel=10):
     lowerRight.setSpeed(i)
   time.sleep(1)
   #stop()
-      
-      
-def forward(speed =255,accel=10,driftRatio=1):
-  #the same with the forward
+
+
+def forward(speed =255,accel=10):
+    '''
+  Input:
+    speed: a number from 1-255 which sends a signal to the motor hat to the DC motor to a certain speed
+    accel: how fast do you want to reach the max speed
+  Output:
+    The motors move that speed
+  '''
   #need to set up the detection on seeing if the motors can be run in parellel
   if speed > 255 or speed < 0:
     return # do nothing for now, write error message at some point
@@ -128,32 +139,29 @@ def forward(speed =255,accel=10,driftRatio=1):
     upperRight.setSpeed(i*driftRatio)
     lowerLeft.setSpeed(i)
     lowerRight.setSpeed(i*driftRatio)
-    
+
     #time.sleep(0.05) # this makes the acceleration slower/faster, debug to find a good amount of time
 
 def stop(speed=0):
   #decellerates, then stops
+    '''
+  Input:
+    speed: a number from 1-255 which sends a signal to the motor hat to the DC motor to a certain speed, in this case it tries to decellerate
+  Output:
+    The motors stop
+  '''
   for i in range(speed)[::-1]:
     upperLeft.setSpeed(i)
     upperRight.setSpeed(i)
     lowerLeft.setSpeed(i)
     lowerRight.setSpeed(i)
+  #this is in the code to allow for the wheels to be "free"
   upperLeft.run(Adafruit_MotorHAT.RELEASE)
   upperRight.run(Adafruit_MotorHAT.RELEASE)
   lowerLeft.run(Adafruit_MotorHAT.RELEASE)
   lowerRight.run(Adafruit_MotorHAT.RELEASE)
-  # optional sleep to make reduce jerkiness
-  #time.sleep(1.0)
-  
-def redirect(direction):
-  # quick 90 degree turn (will need some code to figure out which one) need to enable sensors for detection
-  # back max speed (unless a collision
-  # another quick 90 degree Turn  to rorganise then zoom past to get behind it
-  turnRight(speed=50, angle=90,sharpness=90)
-  back(speed=90)
-  turnRight(speed=50, angle=90,sharpness=90)
-  turnLeft(sharpness=20,untilStop=True)
-  forward(speed=50)
+
+#this was a playground to make sure the movement worked as expected
 def movementTest():
   try:
     forward(75)
@@ -172,4 +180,5 @@ def movementTest():
     #stop()
   finally:
     stop()
-movementTest()
+#uncomment the movement test to run the program from the commandline as python movement.py
+#movementTest()
